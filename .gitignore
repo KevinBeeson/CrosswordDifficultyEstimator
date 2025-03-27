@@ -1,1 +1,3 @@
 crosswords/
+xd-puzzles/gxd/*
+!xd-puzzles/gxd/nytimes/

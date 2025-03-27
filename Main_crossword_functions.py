@@ -10,6 +10,15 @@ def empty_spaces(answers: list)->int:
                 empty += 1
     return empty
 
+def filled_spaces(answers: list)->int:
+    #This function will return the number of filled spaces in the crossword
+    filled = 0
+    for row in answers:
+        for letter in row:
+            if letter != '#':
+                filled += 1
+    return filled
+
 def split_sections(raw_crossword: str):
     #This function will split the raw xd file into the three sections, metadata, answers, and clues
     metadata = {}
