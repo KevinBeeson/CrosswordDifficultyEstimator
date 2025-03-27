@@ -16,23 +16,19 @@ def split_sections(raw_crossword: str):
     answers = []
     clues = []
 
-    # Get the meta data from the header of the string
-    title=raw_crossword[0].split(":")[1].strip()
+    # Get the meta data from the header of the string and sees where the metadata ends
+    metadata_wanted=['title','author','copyright','date']
+    for end_of_metadata,line in enumerate(raw_crossword):
+        if line == '\n':
+            break
+        line_split = line.split(":")
+        if line_split[0] in metadata_wanted:
+            metadata[line_split[0]] = line_split[1].strip()
 
-    author=raw_crossword[1].split(":")[1].strip()
-
-    copyright=raw_crossword[2].split(":")[1].strip()
-
-    date = raw_crossword[3].split(":")[1].strip()
-
-    metadata['title'] = title
-    metadata['author'] = author
-    metadata['copyright'] = copyright
-    metadata['date'] = date
 
     # Get the answers from the string
 
-    for i in range(6,len(raw_crossword)):
+    for i in range(end_of_metadata+2,len(raw_crossword)):
         if raw_crossword[i] == '\n':
             break
         else:
@@ -57,8 +53,12 @@ def opening_file(date:str)->list[str]:
     month=date.split("-")[1]
     day=date.split("-")[2]
     directory=base+"/"+year+"/nyt"+date+".xd"
-    with open(directory) as f:
-        crossword = f.readlines()
+    try:
+        with open(directory) as f:
+            crossword = f.readlines()
+    except:
+        print("The file for the date "+date+" does not exist")
+        return None
     return crossword
 def __main__():
     date='2021-01-01'
