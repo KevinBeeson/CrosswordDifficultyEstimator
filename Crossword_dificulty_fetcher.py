@@ -13,7 +13,7 @@ except:
     df = pd.DataFrame(columns = ['title', 'date','difficulty','average_time','average_increase', 'faster', 'much_faster', 'slower', 'much_slower'])
 
 
-for pages in range(1,50):
+for pages in range(1,458):
     # load the main puzzle page
     main_page = requests.get('https://xwstats.com/puzzles?p='+str(pages))
     soup = BeautifulSoup(main_page.content, 'html.parser')
@@ -69,7 +69,7 @@ for pages in range(1,50):
             much_slower=small_text_facts[3].strip()
             much_slower_number=much_slower.split(" ")[0]
             much_slower_number = float(''.join(filter(str.isdigit, much_slower_number)))
-            df.loc[len(df)]={'title': title, 'date': date,'difficulty':difficulty,'average_time':average_time,'average_increase':average_increase, 'faster':faster_number, 'much_faster':much_faster_number, 'slower':slower_number, 'much_slower':much_slower_number}
+            df.loc[len(df)]={'title': title, 'date': str(date.date()),'difficulty':difficulty,'average_time':average_time,'average_increase':average_increase, 'faster':faster_number, 'much_faster':much_faster_number, 'slower':slower_number, 'much_slower':much_slower_number}
             df.to_csv('crosswords_hardness.csv', index=False)
             print("Data fetched")
             #wait for 1 second
