@@ -1,42 +1,45 @@
-# CrosswordDifficultyEstimator
-The endgame for this tool is to create a tool that you can input a set of clues and answers and then the python tool will then estimate how long it will take for an average crossword user to finish the crossword.
+# Crossword Difficulty Estimator
 
-# Data sources
+The ultimate goal of this project is to develop a tool that, given a set of crossword clues and answers, estimates how long it would take an average crossword solver to complete the puzzle.
 
-The New York Time runs a long running daily crosswords. These crosswords differ in dificulty based on the day of the week. With Monday's being considered the easiest and Saturday the hardest. As there is a large variety of hardness and with a large amount of data I have choosen to focus on this crossword.
+## Data Sources
 
+The New York Times (NYT) publishes daily crosswords known for varying difficulty levels, dependent on the day of the week—Mondays are the easiest, while Saturdays are generally considered the hardest. Given the wide variety in puzzle difficulties and the availability of extensive historical data, I've chosen to focus specifically on analyzing NYT crosswords.
 
-https://xwstats.com/ Will be the main source of data for average completion time for a crossword. The website allows users to track their average time to complete the New York Times Crossword. The website provides the average amount of time (Global Median Solver) for a user to finish the NYT crossword.
+### Primary Data Source:
+- [xwstats.com](https://xwstats.com/): This website allows users to track their crossword-solving times and provides aggregated data on average completion times (Global Median Solver) for each day's puzzle.
 
-To get the crosswords it self I have been using two websites https://xd.saul.pw/ and https://www.xwordinfo.com/. 
+### Crossword Puzzle Data:
+To acquire the actual crosswords (clues and answers), I'm primarily utilizing these two resources:
+- [xd.saul.pw](https://xd.saul.pw/)
+- [xwordinfo.com](https://www.xwordinfo.com/)
 
+Throughout the project, I aim to minimize reliance on external data by replicating key metrics and methodologies found on these websites.
 
-Throught this excersice I will minimize the amount of data that isnt generated inhouse and will try to replicate metrics on these websites.
+## Tools Used in this Project
 
+- **`Crossword_difficulty_fetcher.py`**: Retrieves average crossword-solving times from [xwstats.com](https://xwstats.com/) and stores the data in `crosswords_hardness.csv`.
+- **`Graph_creator.ipynb`**: Generates the graphs used in preliminary data analysis.
+- **`Main_crossword_functions.py`**: Contains reusable functions utilized across various parts of this project.
 
-1. 
+## Preliminary Data Analysis from xwstats.com
 
-# tools
-- Crossword_dificulty_fetcher.py can get the average time to complete a crosswords from https://xwstats.com/ and then stores it in crosswords_hardness.csv
+Xwstats provides average crossword-solving time data dating back to 1995. However, data for earlier puzzles may reflect retroactive solves (i.e., puzzles solved long after their original publication dates), which could impact data accuracy and representativeness.
 
-- Graph_creator.ipynb Creates the graphs used in the pelimenary data analysis 
+Analyzing average Wednesday crossword-solving times (see image below) shows that data prior to 2018 diverges significantly into three distinct groups. It's unclear why this divergence occurs—perhaps early puzzles attract specific dedicated solvers who dominate this subset of data. To ensure data consistency, subsequent analysis will exclusively use data from **2018 onward**.
 
-- Main_crossword_functions.py stores the functions that will be used multiple times accross different programs
+![Average Wednesday Completion Times](Images/Average%20time%20to%20complete%20the%20crossword%20on%20Wednesdays.png)
 
-# Preliminary data analysis from the https://xwstats.com/
+Next, let's compare average crossword-solving times by day of the week:
 
-Xwstats provides data for the average time to solve a crossword from 1995, although the data is provided from then some of the older crosswords will be a retroactive solve (i.e. The user was solving a crossword that was not freshly printed that week). 
+![Average Time by Day of Week](Images/average_time_by_day.png)
 
-Looking at The image below we can crealy see that any data before 2018 diverges into three main sections. Not sure why this happens maybe some users dominate these crosswords. not sure. so for the rest of the anaylsis we will only be using data afer 2018.
+As expected, Monday puzzles take the shortest time on average, while Sunday puzzles require the longest. However, puzzle length variation (number of letters required to complete each puzzle) could bias this comparison.
 
-![image](Images/Average%20time%20to%20complete%20the%20crossword%20on%20Wednesdays.png)
+To address this, the average solving times were normalized by dividing by the number of letters required to complete each puzzle:
 
-Lets then see the avergae time it takes to solve a crossword divided into the crosswords release day.
+![Normalized Average Time per Letter](Images/crossword_time_per_letter_by_day.png)
 
-![image](Images/average_time_by_day.png)
-
-We can clearly see that the Monday crossword takes the least amount of time and Sundays takes the most. However this data can be skewed as some crosswords require more letters to solve than others.
-
-![image](Images/crossword_time_per_letter_by_day.png)
-
-When we Normalise this by the amount of letters needed to solve the crossword we can see that Saturday and Sunday swap places. Friday overtakes Saturday. This shows that Sunday's longer solving time is partly down to the crossword size rather than the clues hardness.
+After normalization:
+- Saturday puzzles now appear harder per letter, overtaking Sunday, which suggests Sunday puzzles' higher overall solving times are primarily due to puzzle length rather than difficulty per clue.
+- Interestingly, Friday puzzles also surpass Saturday puzzles slightly in normalized difficulty, suggesting complexity per clue is somewhat comparable or occasionally harder on Fridays.
