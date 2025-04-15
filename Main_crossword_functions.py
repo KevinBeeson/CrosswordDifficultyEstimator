@@ -2,25 +2,25 @@
 import pandas as pd
 import os 
 
-def empty_spaces(answers: list)->int:
+def empty_spaces(answers_square: list)->int:
     #This function will return the number of empty spaces in the crossword
     empty = 0
-    for row in answers:
+    for row in answers_square:
         for letter in row:
             if letter == '#':
                 empty += 1
     return empty
 
-def filled_spaces(answers: list)->int:
+def filled_spaces(answers_square: list)->int:
     #This function will return the number of filled spaces in the crossword
     filled = 0
-    for row in answers:
+    for row in answers_square:
         for letter in row:
             if letter != '#':
                 filled += 1
     return filled
 
-def split_sections(raw_crossword: str):
+def split_sections(raw_crossword: str,date: str):
     #This function will split the raw xd file into the three sections, metadata, answers, and clues
     metadata = {}
     answers_square = []
@@ -37,7 +37,8 @@ def split_sections(raw_crossword: str):
         #check if the line contains the metadata we want
         if line_split[0].lower() in metadata_wanted:
             metadata[line_split[0]] = line_split[1].strip()
-
+    if not 'Date' in metadata:
+        metadata['Date'] = date
 
     # Get the answers from the string
 
@@ -108,7 +109,7 @@ def opening_file(date: str, base: str = 'nytimes') -> list[str]:
 def __main__():
     date='2021-01-01'
     crossword=opening_file(date)
-    metadata,answers,clues=split_sections(crossword)
+    metadata,answers,clues=split_sections(crossword,date)
     print(metadata)
     print(answers)
     print(clues)
