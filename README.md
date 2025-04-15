@@ -43,3 +43,7 @@ To address this, the average solving times were normalized by dividing by the nu
 After normalization:
 - Saturday puzzles now appear harder per letter, overtaking Sunday, which suggests Sunday puzzles' higher overall solving times are primarily due to puzzle length rather than difficulty per clue.
 - Interestingly, Friday puzzles also surpass Saturday puzzles slightly in normalized difficulty, suggesting complexity per clue is somewhat comparable or occasionally harder on Fridays.
+
+## Creating a Crossword database
+
+Using the crosswords from [xd.saul.pw](https://xd.saul.pw/) using the database_creator.py, it will create a sql database for easier data manipulations.
