@@ -3,6 +3,7 @@ import requests
 import pandas as pd  
 from bs4 import BeautifulSoup  
 import time
+import logging
 
 #see if there is a 
 
@@ -30,8 +31,8 @@ for pages in range(1,458):
     example_link="https://xwstats.com"+links[0]
     for date,link in zip(dates,links):
         if date not in pd.to_datetime(df['date']).values:
-            print("Fetching data for the first time")
-            print("Fetching "+date.strftime("%Y-%m-%d"))
+            logging.info("Fetching data for the first time")
+            logging.info("Fetching "+date.strftime("%Y-%m-%d"))
             # load the first crossword page
             html_crossword_page = requests.get("https://xwstats.com"+link)
             soup = BeautifulSoup(html_crossword_page.content, 'html.parser')
@@ -71,8 +72,8 @@ for pages in range(1,458):
             much_slower_number = float(''.join(filter(str.isdigit, much_slower_number)))
             df.loc[len(df)]={'title': title, 'date': str(date.date()),'difficulty':difficulty,'average_time':average_time,'average_increase':average_increase, 'faster':faster_number, 'much_faster':much_faster_number, 'slower':slower_number, 'much_slower':much_slower_number}
             df.to_csv('crosswords_hardness.csv', index=False)
-            print("Data fetched")
+            logging.info("Data fetched")
             #wait for 1 second
             time.sleep(1)
         else:
-            print("Data already fetched")
+            logging.info("Data already fetched")

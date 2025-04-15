@@ -5,7 +5,7 @@ import pandas as pd
 import Main_crossword_functions as mcf
 import os
 import json
-
+import logging
 con = sqlite3.connect("crossword.db")
 cur = con.cursor()
 cur.execute("DROP TABLE IF EXISTS crosswords")
@@ -38,9 +38,9 @@ cur.execute("""
 
 names_of_companies = os.listdir('xd-puzzles/gxd/')
 for company in names_of_companies:
-    years=os.listdir('xd-puzzles/gxd/'+company)
+    years=[x for x in os.listdir('xd-puzzles/gxd/'+company) if os.path.isdir('xd-puzzles/gxd/'+company+'/'+x)]
     for year in years:
-        dates=os.listdir('xd-puzzles/gxd/'+company+'/'+year)
+        dates=[x for x in os.listdir('xd-puzzles/gxd/'+company+'/'+year) if not os.path.isdir('xd-puzzles/gxd/'+company+'/'+year+'/'+x)]
         for date in dates:
                         # get prefix
             prefix=""
@@ -52,10 +52,11 @@ for company in names_of_companies:
             # get the date
             date=date[len(prefix):-3]
             crossword=mcf.opening_file(date,company)
-            metadata,answers_square,location,clues,answer=mcf.split_sections(crossword)
+            metadata,answers_square,location,clues,answer=mcf.split_sections(crossword,date)
 
             #title,author,copyright,date, company, answers_square,location,clues,answer
-            metadata_strings=[str(metadata[x]) for x in metadata]
+            right_order = ['Title','Author','Copyright','Date']
+            metadata_strings=[str(metadata[x]) for x in right_order]
             metadata_strings+=[company,json.dumps(answers_square),json.dumps(location),json.dumps(clues),json.dumps(answer)]
             # Insert metadata into the crosswords table
             table_name = 'crosswords'
@@ -66,8 +67,8 @@ for company in names_of_companies:
                             VALUES (?,?,?,?,?,?,?,?,?)"""
                             ,metadata_strings)
             except sqlite3.ProgrammingError:
-                print("Error: ",metadata_strings)
-                print("Error: ",cur.execute(f"PRAGMA table_info({table_name})").fetchall())
+                logging.warning("Error: ",metadata_strings)
+                logging.warning("Error: ",cur.execute(f"PRAGMA table_info({table_name})").fetchall())
                 raise
             con.commit()
 
@@ -75,11 +76,23 @@ for company in names_of_companies:
 
             # Insert clues into the clues table
             for i, clue in enumerate(clues[0]):
-                cur.execute("INSERT INTO clues (crossword_id, clue, answer, direction, number) VALUES (?, ?, ?, ?, ?)",
-                            (crossword_id, clue, answer[0][i], 'across', int(location[0][i][1:])))
+                try:
+                    cur.execute("INSERT INTO clues (crossword_id, clue, answer, direction, number) VALUES (?, ?, ?, ?, ?)",
+                                (crossword_id, clue, answer[0][i], 'across', int(location[0][i][1:])))
+                except ValueError:
+                    logging.warning("Error: ",(crossword_id, clue, answer[0][i], 'across', location[0][i][1:]))
+                    logging.warning("Error: ",metadata_strings)
+                    raise
             for i, clue in enumerate(clues[1]):
-                cur.execute("INSERT INTO clues (crossword_id, clue, answer, direction, number) VALUES (?, ?, ?, ?, ?)",
-                            (crossword_id, clue, answer[1][i], 'down', int(location[1][i][1:])))
+                try:
+                    cur.execute("INSERT INTO clues (crossword_id, clue, answer, direction, number) VALUES (?, ?, ?, ?, ?)",
+                                (crossword_id, clue, answer[1][i], 'down', int(location[1][i][1:])))
+                except ValueError:
+                    logging.warning("Error: ",(crossword_id, clue, answer[0][i], 'across', location[0][i][1:]))
+                    logging.warning("Error: ",metadata_strings)
+                    raise
+                
+
             con.commit()
             # Insert grid locations into the grid_locations table
 

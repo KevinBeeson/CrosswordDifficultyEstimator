@@ -1,7 +1,7 @@
 #This file will contain the main function for the program
 import pandas as pd
 import os 
-
+import logging
 def empty_spaces(answers_square: list)->int:
     #This function will return the number of empty spaces in the crossword
     empty = 0
@@ -39,6 +39,12 @@ def split_sections(raw_crossword: str,date: str):
             metadata[line_split[0]] = line_split[1].strip()
     if not 'Date' in metadata:
         metadata['Date'] = date
+    if not 'Copyright' in metadata:
+        metadata['Copyright'] = 'No copyright'
+    if not 'Author' in metadata:
+        metadata['Author'] = 'No author'
+    if not 'Title' in metadata:
+        metadata['Title'] = 'No title'
 
     # Get the answers from the string
 
@@ -91,10 +97,10 @@ def opening_file(date: str, base: str = 'nytimes') -> list[str]:
     all_files=os.listdir(base+"/"+year)
     masked = [s for s in all_files if date in s]
     if len(masked) == 0:
-        print("The file for the date "+date+" does not exist")
+        logging.warning("The file for the date "+date+" does not exist")
         return None
     elif len(masked) > 1:
-        print("There are multiple files for the date "+date+" please specify the file")
+        logging.warning("There are multiple files for the date "+date+" please specify the file")
         return None
     else:
         directory=base+"/"+year+"/"+masked[0]
@@ -103,16 +109,16 @@ def opening_file(date: str, base: str = 'nytimes') -> list[str]:
         with open(directory) as f:
             crossword = f.readlines()
     except:
-        print("The file for the date "+date+" does not exist")
+        logging.warning("The file for the date "+date+" does not exist")
         return None
     return crossword
 def __main__():
     date='2021-01-01'
     crossword=opening_file(date)
     metadata,answers,clues=split_sections(crossword,date)
-    print(metadata)
-    print(answers)
-    print(clues)
-    print(empty_spaces(answers))
+    logging.info(metadata)
+    logging.info(answers)
+    logging.info(clues)
+    logging.info(empty_spaces(answers))
 
 
