@@ -23,8 +23,10 @@ def filled_spaces(answers: list)->int:
 def split_sections(raw_crossword: str):
     #This function will split the raw xd file into the three sections, metadata, answers, and clues
     metadata = {}
-    answers = []
+    answers_square = []
+    location = []
     clues = []
+    answers = []
 
     # Get the meta data from the header of the string and sees where the metadata ends
     metadata_wanted=['title','author','copyright','date']
@@ -43,20 +45,39 @@ def split_sections(raw_crossword: str):
         if raw_crossword[i] == '\n':
             break
         else:
-            answers.append(raw_crossword[i].strip())
+            answers_square.append(raw_crossword[i].strip())
     # Get the clues from the string
     accross_clues = []
+    accross_answers= []
     down_clues = []
+    down_answers = []
+    accross_location = []
+    down_location = []
     for j in range(i+2,len(raw_crossword)):
         if raw_crossword[j] == '\n':
             break
         else:
-            accross_clues.append(raw_crossword[j].strip())
+            line=raw_crossword[j].strip()
+            clue_line=line.split("~")[0].strip()
+            accross_location.append(clue_line.split(".")[0].strip())
+            accross_clues.append(clue_line.split(".")[1].strip())
+            accross_answers.append(line.split("~")[1].strip())
     for k in range(j+1,len(raw_crossword)):
-        down_clues.append(raw_crossword[k].strip())
+        if raw_crossword[k] == '\n':
+            break
+        line=raw_crossword[k].strip()
+        clue_line=line.split("~")[0].strip()
+        down_location.append(clue_line.split(".")[0].strip())
+        down_clues.append(clue_line.split(".")[1].strip())
+        down_answers.append(line.split("~")[1].strip())
+
     clues.append(accross_clues)
     clues.append(down_clues)
-    return metadata,answers,clues
+    answers.append(accross_answers)
+    answers.append(down_answers)
+    location.append(accross_location)
+    location.append(down_location)
+    return metadata,answers_square,location,clues,answers
 def opening_file(date: str, base: str = 'nytimes') -> list[str]:
     #This function will open the right new york times crossword file given the date
     base='xd-puzzles/gxd/'+base
