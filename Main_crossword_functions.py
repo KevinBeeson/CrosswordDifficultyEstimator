@@ -1,5 +1,6 @@
 #This file will contain the main function for the program
 import pandas as pd
+import os 
 
 def empty_spaces(answers: list)->int:
     #This function will return the number of empty spaces in the crossword
@@ -31,7 +32,8 @@ def split_sections(raw_crossword: str):
         if line == '\n':
             break
         line_split = line.split(":")
-        if line_split[0] in metadata_wanted:
+        #check if the line contains the metadata we want
+        if line_split[0].lower() in metadata_wanted:
             metadata[line_split[0]] = line_split[1].strip()
 
 
@@ -58,10 +60,23 @@ def split_sections(raw_crossword: str):
 def opening_file(date: str, base: str = 'nytimes') -> list[str]:
     #This function will open the right new york times crossword file given the date
     base='xd-puzzles/gxd/'+base
+
     year=date.split("-")[0]
     month=date.split("-")[1]
     day=date.split("-")[2]
-    directory=base+"/"+year+"/nyt"+date+".xd"
+    #The prefix for the company names are all different and kinda random so we will find the prefix first
+
+    all_files=os.listdir(base+"/"+year)
+    masked = [s for s in all_files if date in s]
+    if len(masked) == 0:
+        print("The file for the date "+date+" does not exist")
+        return None
+    elif len(masked) > 1:
+        print("There are multiple files for the date "+date+" please specify the file")
+        return None
+    else:
+        directory=base+"/"+year+"/"+masked[0]
+    #We will now open the file and read it into a list
     try:
         with open(directory) as f:
             crossword = f.readlines()
