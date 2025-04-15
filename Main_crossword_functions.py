@@ -55,9 +55,9 @@ def split_sections(raw_crossword: str):
     clues.append(accross_clues)
     clues.append(down_clues)
     return metadata,answers,clues
-def opening_file(date:str)->list[str]:
+def opening_file(date: str, base: str = 'nytimes') -> list[str]:
     #This function will open the right new york times crossword file given the date
-    base='xd-puzzles/gxd/nytimes'
+    base='xd-puzzles/gxd/'+base
     year=date.split("-")[0]
     month=date.split("-")[1]
     day=date.split("-")[2]
