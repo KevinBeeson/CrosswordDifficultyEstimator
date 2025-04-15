@@ -44,6 +44,53 @@ After normalization:
 - Saturday puzzles now appear harder per letter, overtaking Sunday, which suggests Sunday puzzles' higher overall solving times are primarily due to puzzle length rather than difficulty per clue.
 - Interestingly, Friday puzzles also surpass Saturday puzzles slightly in normalized difficulty, suggesting complexity per clue is somewhat comparable or occasionally harder on Fridays.
 
-## Creating a Crossword database
+## Creating the Crossword Database
 
-Using the crosswords from [xd.saul.pw](https://xd.saul.pw/) using the database_creator.py, it will create a sql database for easier data manipulations.
+To efficiently analyze and manipulate crossword puzzle data, we use a structured SQLite database created via `database_creator.py`.
+
+This script does the following:
+
+1. **Builds the database schema:**
+   - `crosswords` table: Contains metadata about each crossword (title, author, date, company, grid layout, etc.).
+   - `clues` table: Stores individual clues, their answers, direction (across/down), and clue numbers, all linked to their respective crossword via a foreign key.
+
+2. **Processes raw puzzle files** from the `xd-puzzles/gxd/` directory:
+   - Organizes puzzles by `company`, `year`, and `date`.
+   - Extracts metadata, clues, answers, and grid information using functions from `Main_crossword_functions.py`.
+
+3. **Populates the database**:
+   - Inserts each crossword into the `crosswords` table.
+   - Inserts its corresponding clues (both across and down) into the `clues` table, using the generated `crossword_id` as a foreign key.
+
+4. **Handles structured fields** like `answers_square`, `clues`, `answers`, and `location` by serializing them as JSON strings. This allows us to preserve nested lists or dictionaries within a single TEXT column.
+
+### 🧠 Schema Overview
+
+#### `crosswords` table:
+| Column           | Type    | Description                        |
+|------------------|---------|------------------------------------|
+| `id`             | INTEGER | Primary key (autoincremented)      |
+| `title`          | TEXT    | Puzzle title                       |
+| `author`         | TEXT    | Puzzle author                      |
+| `copyright`      | TEXT    | Copyright string                   |
+| `date`           | TEXT    | Puzzle date                        |
+| `company`        | TEXT    | Source of the puzzle               |
+| `answers_square` | TEXT    | Serialized list of grid answers    |
+| `location`       | TEXT    | Serialized list of clue positions  |
+| `clues`          | TEXT    | Serialized list of clue text       |
+| `answers`        | TEXT    | Serialized list of answers         |
+
+#### `clues` table:
+| Column         | Type    | Description                                |
+|----------------|---------|--------------------------------------------|
+| `id`           | INTEGER | Primary key                                |
+| `crossword_id` | INTEGER | Foreign key referencing `crosswords(id)`   |
+| `clue`         | TEXT    | Clue text                                  |
+| `answer`       | TEXT    | Answer to the clue                         |
+| `direction`    | TEXT    | Either 'across' or 'down'                  |
+| `number`       | INTEGER | Clue number                                |
+
+###  To run the database creator:
+
+```bash
+python database_creator.py
